@@ -1,14 +1,16 @@
 import turtle
 import time
+import random
 
 
-delay = 0.003
+delay = .01
+global_increment = 10
+# delay = 0.003
 
 # screen setup
 window = turtle.Screen()
 window.title("slither.io")
-window.bgcolor("#d6629c")
-# window.bgcolor("#b70303")
+window.bgcolor("white")
 window.setup(width=600, height=600)
 window.tracer(0)  # turns off screen update
 
@@ -22,7 +24,18 @@ head.goto(0, 0)
 head.direction = "stop"
 
 
-# function
+#snake food
+food = turtle.Turtle()
+food.speed(0)
+food.shape("circle")
+food.color("black")
+food.penup()
+food.goto(0, 100)
+
+segments = []
+
+# functions
+
 def move_up():
     head.direction = "up"
     head.setheading(90)
@@ -49,9 +62,8 @@ def pen_up():
     head.penup()
 
 
-def move():
-    movement_increment = 1
-
+def move_head():
+    movement_increment = global_increment
     if head.direction == "up":
         y = head.ycor()
         head.sety(y + movement_increment)
@@ -67,6 +79,28 @@ def move():
     if head.direction == "right":
         x = head.xcor()
         head.setx(x + movement_increment)
+
+# add a new segment
+def add_segment(segments):
+    new_segment = turtle.Turtle()
+    new_segment.speed(0)
+    new_segment.shape('square')
+    new_segment.color('grey')
+    new_segment.penup()
+    segments.append(new_segment)
+
+def move_tail(segments):
+    print(">>>>")
+    print(segments)
+    for index in range(len(segments) - 1, 0, -1):
+        x = segments[index - 1].xcor()
+        y = segments[index - 1].ycor()
+        segments[index].goto(x, y)
+    if len(segments) > 0:
+        x = head.xcor()
+        y = head.ycor()
+        segments[0].goto(x, y)
+
 
 #keybindings
 window.listen()
@@ -88,7 +122,17 @@ window.onkeypress(pen_up, "f")
 while True:
     window.update()
 
-    move()
+# check for collision with the food
+    if head.distance(food) < 20:
+        #move the food to random spot on screen
+        x = random.randint(-280, 280)
+        y = random.randint(-280, 280)
+        food.goto(x, y)
+        add_segment(segments)
+
+    move_head()
+    move_tail(segments)
+
 
     time.sleep(delay)
 

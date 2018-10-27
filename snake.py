@@ -3,8 +3,8 @@ import time
 import random
 
 
-delay = .01
-global_increment = 10
+delay = .08
+global_increment = 20
 # delay = 0.003
 
 # screen setup
@@ -17,7 +17,7 @@ window.tracer(0)  # turns off screen update
 # snake head
 head = turtle.Turtle()
 head.speed(0)
-head.shape("triangle")
+head.shape("square")
 head.color("black")
 head.penup()
 head.goto(0, 0)
@@ -81,7 +81,7 @@ def move_head():
         head.setx(x + movement_increment)
 
 # add a new segment
-def add_segment(segments):
+def add_segment():
     new_segment = turtle.Turtle()
     new_segment.speed(0)
     new_segment.shape('square')
@@ -89,18 +89,20 @@ def add_segment(segments):
     new_segment.penup()
     segments.append(new_segment)
 
-def move_tail(segments):
-    print(">>>>")
-    print(segments)
-    for index in range(len(segments) - 1, 0, -1):
-        x = segments[index - 1].xcor()
-        y = segments[index - 1].ycor()
-        segments[index].goto(x, y)
+def move():
+    x = head.xcor()
+    y = head.ycor()
+    move_head()
     if len(segments) > 0:
-        x = head.xcor()
-        y = head.ycor()
+        for index in range(len(segments) - 1, 0, -1):
+            xs = segments[index - 1].xcor()
+            ys = segments[index - 1].ycor()
+            segments[index].goto(xs, ys)
         segments[0].goto(x, y)
 
+# def move():
+#     move_head()
+#     move_tail()
 
 #keybindings
 window.listen()
@@ -128,10 +130,9 @@ while True:
         x = random.randint(-280, 280)
         y = random.randint(-280, 280)
         food.goto(x, y)
-        add_segment(segments)
+        add_segment()
 
-    move_head()
-    move_tail(segments)
+    move()
 
 
     time.sleep(delay)

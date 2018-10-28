@@ -94,11 +94,11 @@ def move():
     y = head.ycor()
     move_head()
     if len(segments) > 0:
+        segments[0].goto(x, y)
         for index in range(len(segments) - 1, 0, -1):
             xs = segments[index - 1].xcor()
             ys = segments[index - 1].ycor()
             segments[index].goto(xs, ys)
-        segments[0].goto(x, y)
 
 # def move():
 #     move_head()

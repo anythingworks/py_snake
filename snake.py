@@ -124,17 +124,45 @@ window.onkeypress(pen_up, "f")
 while True:
     window.update()
 
-# check for collision with the food
+    # check for collision with border
+    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
+        time.sleep(1)
+        head.goto(0, 0)
+        head.direction = "stop"
+
+        # hide segments
+        for segment in segments:
+            segment.goto(1000, 1000)
+
+        # clear segments list
+        segments.clear()
+
+    # check for collision with the food
     if head.distance(food) < 20:
-        #move the food to random spot on screen
+        # move the food to random spot on screen
         x = random.randint(-280, 280)
         y = random.randint(-280, 280)
         food.goto(x, y)
         add_segment()
 
+
     move()
+
+    # check for collision with segments
+    for segment in segments:
+        if segment.distance(head) < 20:
+            time.sleep(1)
+            head.goto(0, 0)
+            head.direction = "stop"
+
+            # hide segments
+            for segment in segments:
+                segment.goto(1000, 1000)
+
+            # clear segments list
+            segments.clear()
 
 
     time.sleep(delay)
 
-window.mainloop()
+

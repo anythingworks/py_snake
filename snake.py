@@ -3,9 +3,8 @@ import time
 import random
 
 
-delay = .08
+delay = .2
 global_increment = 20
-# delay = 0.003
 
 # screen setup
 window = turtle.Screen()
@@ -36,6 +35,7 @@ segments = []
 
 # functions
 
+
 def move_up():
     head.direction = "up"
     head.setheading(90)
@@ -62,6 +62,16 @@ def pen_up():
     head.penup()
 
 
+# add a new segment
+def add_segment():
+    new_segment = turtle.Turtle()
+    new_segment.speed(0)
+    new_segment.shape('square')
+    new_segment.color('grey')
+    new_segment.penup()
+    segments.append(new_segment)
+
+
 def move_head():
     movement_increment = global_increment
     if head.direction == "up":
@@ -80,29 +90,42 @@ def move_head():
         x = head.xcor()
         head.setx(x + movement_increment)
 
-# add a new segment
-def add_segment():
-    new_segment = turtle.Turtle()
-    new_segment.speed(0)
-    new_segment.shape('square')
-    new_segment.color('grey')
-    new_segment.penup()
-    segments.append(new_segment)
 
 def move():
-    x = head.xcor()
-    y = head.ycor()
-    move_head()
     if len(segments) > 0:
-        segments[0].goto(x, y)
         for index in range(len(segments) - 1, 0, -1):
             xs = segments[index - 1].xcor()
             ys = segments[index - 1].ycor()
             segments[index].goto(xs, ys)
+        segments[0].goto(head.xcor(), head.ycor())
+    move_head()
 
-# def move():
-#     move_head()
-#     move_tail()
+def detect_collision():
+    def reset_segments():
+        head.goto(0, 0)
+        head.direction = "stop"
+        # hide segments
+        for segment in segments:
+            # segment.goto(1000, 1000)
+            # Delete the turtle trail (if any)
+            segment.clear()
+            # Hide the turtle
+            segment.ht()
+            # Delete the turtle object
+            del segment
+        segments.clear()
+
+    # check for collision with segments
+    for segment in segments:
+        if segment.distance(head) < 20:
+            time.sleep(1)
+            reset_segments()
+
+    # check for collision with border
+    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
+        time.sleep(1)
+        reset_segments()
+
 
 #keybindings
 window.listen()
@@ -124,18 +147,7 @@ window.onkeypress(pen_up, "f")
 while True:
     window.update()
 
-    # check for collision with border
-    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
-        time.sleep(1)
-        head.goto(0, 0)
-        head.direction = "stop"
 
-        # hide segments
-        for segment in segments:
-            segment.goto(1000, 1000)
-
-        # clear segments list
-        segments.clear()
 
     # check for collision with the food
     if head.distance(food) < 20:
@@ -147,20 +159,8 @@ while True:
 
 
     move()
+    detect_collision()
 
-    # check for collision with segments
-    for segment in segments:
-        if segment.distance(head) < 20:
-            time.sleep(1)
-            head.goto(0, 0)
-            head.direction = "stop"
-
-            # hide segments
-            for segment in segments:
-                segment.goto(1000, 1000)
-
-            # clear segments list
-            segments.clear()
 
 
     time.sleep(delay)

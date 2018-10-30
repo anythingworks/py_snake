@@ -3,7 +3,7 @@ import time
 import random
 
 
-delay = .2
+delay = 0.2
 global_increment = 20
 
 # screen setup
@@ -32,6 +32,8 @@ food.penup()
 food.goto(0, 100)
 
 segments = []
+next_heading = 0
+next_direction = "stop"
 
 # functions
 
@@ -39,38 +41,35 @@ opposing_direction = {
     'up': 'down',
     'down': 'up',
     'left': 'right',
-    'right': 'left'
+    'right': 'left',
+    'stop': 'stop'
 }
-next_heading = 0
-next_direction = "stop"
+
+
 
 
 def move_up():
-    # next_direction = "up"
-    # next_heading = 90
-    head.direction = "up"
-    head.setheading(90)
+    global next_direction, next_heading
+    next_direction = "up"
+    next_heading = 90
 
 
 def move_down():
-    # next_direction = "down"
-    # next_heading = 270
-    head.direction = "down"
-    head.setheading(270)
+    global next_direction, next_heading
+    next_direction = "down"
+    next_heading = 270
 
 
 def move_left():
-    # next_direction = "left"
-    # next_heading = 180
-    head.direction = "left"
-    head.setheading(180)
+    global next_direction, next_heading
+    next_direction = "left"
+    next_heading = 180
 
 
 def move_right():
-    # next_direction = "right"
-    # next_heading = 0
-    head.direction = "right"
-    head.setheading(0)
+    global next_direction, next_heading
+    next_direction = "right"
+    next_heading = 0
 
 def move_stop():
     head.direction = "stop"
@@ -112,8 +111,10 @@ def move_head():
 
 
 def move():
-    # head.direction = next_direction
-    # head.setheading(next_heading)
+    global next_direction, next_heading
+    if next_direction != opposing_direction[head.direction]:
+        head.direction = next_direction
+        head.setheading(next_heading)
     if len(segments) > 0:
         for index in range(len(segments) - 1, 0, -1):
             xs = segments[index - 1].xcor()
@@ -182,5 +183,6 @@ while True:
     detect_collision()
 
     time.sleep(delay)
+    print(head.direction)
 
 

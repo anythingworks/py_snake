@@ -35,20 +35,40 @@ segments = []
 
 # functions
 
+opposing_direction = {
+    'up': 'down',
+    'down': 'up',
+    'left': 'right',
+    'right': 'left'
+}
+next_heading = 0
+next_direction = "stop"
+
 
 def move_up():
+    # next_direction = "up"
+    # next_heading = 90
     head.direction = "up"
     head.setheading(90)
 
+
 def move_down():
+    # next_direction = "down"
+    # next_heading = 270
     head.direction = "down"
     head.setheading(270)
 
+
 def move_left():
+    # next_direction = "left"
+    # next_heading = 180
     head.direction = "left"
     head.setheading(180)
 
+
 def move_right():
+    # next_direction = "right"
+    # next_heading = 0
     head.direction = "right"
     head.setheading(0)
 
@@ -92,6 +112,8 @@ def move_head():
 
 
 def move():
+    # head.direction = next_direction
+    # head.setheading(next_heading)
     if len(segments) > 0:
         for index in range(len(segments) - 1, 0, -1):
             xs = segments[index - 1].xcor()
@@ -126,6 +148,14 @@ def detect_collision():
         time.sleep(1)
         reset_segments()
 
+def detect_food():
+    # check for collision with the food
+    if head.distance(food) < 20:
+        # move the food to random spot on screen
+        x = random.randint(-280, 280)
+        y = random.randint(-280, 280)
+        food.goto(x, y)
+        add_segment()
 
 #keybindings
 window.listen()
@@ -147,21 +177,9 @@ window.onkeypress(pen_up, "f")
 while True:
     window.update()
 
-
-
-    # check for collision with the food
-    if head.distance(food) < 20:
-        # move the food to random spot on screen
-        x = random.randint(-280, 280)
-        y = random.randint(-280, 280)
-        food.goto(x, y)
-        add_segment()
-
-
+    detect_food()
     move()
     detect_collision()
-
-
 
     time.sleep(delay)
 

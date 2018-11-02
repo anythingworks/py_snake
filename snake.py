@@ -3,7 +3,7 @@ import time
 import random
 
 
-delay = 0.2
+delay = .13
 global_increment = 20
 
 # screen setup
@@ -23,7 +23,7 @@ head.goto(0, 0)
 head.direction = "stop"
 
 
-#snake food
+# snake food
 food = turtle.Turtle()
 food.speed(0)
 food.shape("circle")
@@ -31,9 +31,19 @@ food.color("black")
 food.penup()
 food.goto(0, 100)
 
+# pen
+pen = turtle.Turtle()
+pen.color('black')
+pen.penup()
+pen.hideturtle()
+pen.goto(0, 260)
+pen.write("score: 0 High Score: 0", align="center", font=("courier", 24, "normal"))
+
+# points = 0
 segments = []
 next_heading = 0
 next_direction = "stop"
+paused = False
 
 # functions
 
@@ -71,15 +81,14 @@ def move_right():
     next_direction = "right"
     next_heading = 0
 
+# functions
+
 def move_stop():
-    head.direction = "stop"
-
-def pen_down():
-    head.pendown()
-
-def pen_up():
-    head.penup()
-
+    global paused
+    if not paused:
+        paused = True
+    else:
+        paused = False
 
 # add a new segment
 def add_segment():
@@ -111,22 +120,26 @@ def move_head():
 
 
 def move():
-    global next_direction, next_heading
-    if next_direction != opposing_direction[head.direction]:
-        head.direction = next_direction
-        head.setheading(next_heading)
-    if len(segments) > 0:
-        for index in range(len(segments) - 1, 0, -1):
-            xs = segments[index - 1].xcor()
-            ys = segments[index - 1].ycor()
-            segments[index].goto(xs, ys)
-        segments[0].goto(head.xcor(), head.ycor())
-    move_head()
+    if not paused:
+        global next_direction, next_heading
+        if next_direction != opposing_direction[head.direction]:
+            head.direction = next_direction
+            head.setheading(next_heading)
+        if len(segments) > 0:
+            for index in range(len(segments) - 1, 0, -1):
+                xs = segments[index - 1].xcor()
+                ys = segments[index - 1].ycor()
+                segments[index].goto(xs, ys)
+            segments[0].goto(head.xcor(), head.ycor())
+        move_head()
 
 def detect_collision():
     def reset_segments():
+        global next_direction
         head.goto(0, 0)
         head.direction = "stop"
+        next_direction = "stop"
+
         # hide segments
         for segment in segments:
             # segment.goto(1000, 1000)
@@ -149,14 +162,17 @@ def detect_collision():
         time.sleep(1)
         reset_segments()
 
-def detect_food():
+def detect_food(points):
     # check for collision with the food
+    # global points
     if head.distance(food) < 20:
+        points += 1
         # move the food to random spot on screen
         x = random.randint(-280, 280)
         y = random.randint(-280, 280)
         food.goto(x, y)
         add_segment()
+    return points
 
 #keybindings
 window.listen()
@@ -171,18 +187,17 @@ window.onkeypress(move_right, "Right")
 window.onkeypress(move_down, "Down")
 
 window.onkeypress(move_stop, "space")
-window.onkeypress(pen_down, "e")
-window.onkeypress(pen_up, "f")
 
 # main game loop
+points = 0
 while True:
+    global points
     window.update()
-
-    detect_food()
+    points = detect_food(points)
     move()
     detect_collision()
+    print(points)
 
     time.sleep(delay)
-    print(head.direction)
 
 

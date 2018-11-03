@@ -59,27 +59,27 @@ opposing_direction = {
 
 
 def move_up():
-    global next_direction, next_heading
-    next_direction = "up"
-    next_heading = 90
-
+    if head.direction != "down":
+        head.direction = "up"
+        head.setheading(90)
 
 def move_down():
-    global next_direction, next_heading
-    next_direction = "down"
-    next_heading = 270
-
+    if head.direction != "up":
+        head.direction = "down"
+        head.setheading(270)
 
 def move_left():
-    global next_direction, next_heading
-    next_direction = "left"
-    next_heading = 180
-
+    if head.direction != "right":
+        head.direction = "left"
+        head.setheading(180)
 
 def move_right():
-    global next_direction, next_heading
-    next_direction = "right"
-    next_heading = 0
+    if head.direction != "left":
+        head.direction = "right"
+        head.setheading(0)
+
+def move_stop():
+    head.direction = "stop"
 
 # functions
 
@@ -121,10 +121,6 @@ def move_head():
 
 def move():
     if not paused:
-        global next_direction, next_heading
-        if next_direction != opposing_direction[head.direction]:
-            head.direction = next_direction
-            head.setheading(next_heading)
         if len(segments) > 0:
             for index in range(len(segments) - 1, 0, -1):
                 xs = segments[index - 1].xcor()

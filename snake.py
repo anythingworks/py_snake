@@ -3,7 +3,7 @@ import time
 import random
 
 
-delay = .13
+delay = .07
 global_increment = 20
 
 # screen setup
@@ -83,7 +83,7 @@ def move_right():
 
 # functions
 
-def move_stop():
+def pause():
     global paused
     if not paused:
         paused = True
@@ -186,7 +186,7 @@ window.onkeypress(move_left, "Left")
 window.onkeypress(move_right, "Right")
 window.onkeypress(move_down, "Down")
 
-window.onkeypress(move_stop, "space")
+window.onkeypress(pause, "space")
 
 # main game loop
 points = 0

@@ -6,7 +6,6 @@ score_file = open('resources/score', 'r')
 all_time_high_score = int(score_file.read())
 current_all_time_high_score = all_time_high_score
 score_file.close()
-# score_file = open('resources/score', 'w')
 
 delay = .07
 global_increment = 20

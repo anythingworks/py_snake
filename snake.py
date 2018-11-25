@@ -2,6 +2,10 @@ import turtle
 import time
 import random
 
+score_file = open('resources/score', 'r')
+all_time_high_score = int(score_file.read())
+current_all_time_high_score = all_time_high_score
+score_file.close()
 
 delay = .07
 global_increment = 20
@@ -37,13 +41,17 @@ pen.color('black')
 pen.penup()
 pen.hideturtle()
 pen.goto(0, 260)
-pen.write("score: 0 High Score: 0", align="center", font=("courier", 24, "normal"))
+pen.write("Score: 0 High Score: 0 All Time High Score: 0", align="center", font=("courier", 11, "normal"))
 
-# points = 0
+# score
+score = 0
+high_score = 0
 segments = []
 next_heading = 0
 next_direction = "stop"
 paused = False
+waiting_to_move = False
+
 
 # functions
 
@@ -59,27 +67,35 @@ opposing_direction = {
 
 
 def move_up():
-    global next_direction, next_heading
-    next_direction = "up"
-    next_heading = 90
-
+    global waiting_to_move
+    if not waiting_to_move and head.direction != "down":
+        head.direction = "up"
+        head.setheading(90)
+        waiting_to_move = True
 
 def move_down():
-    global next_direction, next_heading
-    next_direction = "down"
-    next_heading = 270
-
+    global waiting_to_move
+    if not waiting_to_move and head.direction != "up":
+        head.direction = "down"
+        head.setheading(270)
+        waiting_to_move = True
 
 def move_left():
-    global next_direction, next_heading
-    next_direction = "left"
-    next_heading = 180
-
+    global waiting_to_move
+    if not waiting_to_move and head.direction != "right":
+        head.direction = "left"
+        head.setheading(180)
+        waiting_to_move = True
 
 def move_right():
-    global next_direction, next_heading
-    next_direction = "right"
-    next_heading = 0
+    global waiting_to_move
+    if not waiting_to_move and head.direction != "left":
+        head.direction = "right"
+        head.setheading(0)
+        waiting_to_move = True
+
+def move_stop():
+    head.direction = "stop"
 
 # functions
 
@@ -120,11 +136,8 @@ def move_head():
 
 
 def move():
+    global waiting_to_move
     if not paused:
-        global next_direction, next_heading
-        if next_direction != opposing_direction[head.direction]:
-            head.direction = next_direction
-            head.setheading(next_heading)
         if len(segments) > 0:
             for index in range(len(segments) - 1, 0, -1):
                 xs = segments[index - 1].xcor()
@@ -132,8 +145,17 @@ def move():
                 segments[index].goto(xs, ys)
             segments[0].goto(head.xcor(), head.ycor())
         move_head()
+        waiting_to_move = False
 
 def detect_collision():
+    global score
+
+    def new_ahs():
+        global all_time_high_score, current_all_time_high_score
+        if current_all_time_high_score > all_time_high_score:
+            score_file = open('resources/score', 'w')
+            score_file.write(str(current_all_time_high_score))
+
     def reset_segments():
         global next_direction
         head.goto(0, 0)
@@ -149,32 +171,49 @@ def detect_collision():
             segment.ht()
             # Delete the turtle object
             del segment
-        segments.clear()
+        segments.clear( )
 
     # check for collision with segments
     for segment in segments:
         if segment.distance(head) < 20:
+            new_ahs()
             time.sleep(1)
             reset_segments()
+            score = 0
+
 
     # check for collision with border
     if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
+        new_ahs()
         time.sleep(1)
         reset_segments()
+        score = 0
+    pen.clear()
+    pen.write("Score: {}  High_Score: {}  All Time High Score {} ".format(score, high_score, current_all_time_high_score), align = "center", font=("courier", 11, "normal"))
 
-def detect_food(points):
+
+def detect_food():
+    global score, high_score, current_all_time_high_score
     # check for collision with the food
     # global points
     if head.distance(food) < 20:
-        points += 1
         # move the food to random spot on screen
         x = random.randint(-280, 280)
         y = random.randint(-280, 280)
         food.goto(x, y)
         add_segment()
-    return points
+        # increase score
 
-#keybindings
+        score += 1
+        if score > high_score:
+            high_score = score
+        if high_score > current_all_time_high_score:
+            current_all_time_high_score = high_score
+
+        pen.clear()
+        pen.write("Score: {}  High_Score: {}  All Time High Score {} ".format(score, high_score, current_all_time_high_score), align = "center", font=("courier", 11, "normal"))
+
+# keybindings
 window.listen()
 window.onkeypress(move_up, "w")
 window.onkeypress(move_left, "a")
@@ -189,14 +228,13 @@ window.onkeypress(move_down, "Down")
 window.onkeypress(pause, "space")
 
 # main game loop
-points = 0
+
 while True:
-    global points
     window.update()
-    points = detect_food(points)
+    detect_food()
     move()
     detect_collision()
-    print(points)
+
 
     time.sleep(delay)
 

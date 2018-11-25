@@ -1,7 +1,6 @@
 import turtle
 import time
 import random
-import os
 
 score_file = open('resources/score', 'r')
 all_time_high_score = int(score_file.read())
